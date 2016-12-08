@@ -24,14 +24,31 @@ namespace Core.Managers
             return new CommentManager(context);
         }
 
-        public void Save(User user, Story story, string comment)
+        public void Save(User user, Story story, string text)
         {
+            if (story.IsActive == false) { }
+
+            Comment comment = new Comment();
+
+            comment.Text = text;
+            Set.Add(comment);
+
+            Context.SaveChanges();
 
         }
 
         public List<Comment> GetList(Story story)
         {
-            return new List<Comment>();
+            var list = new List<Comment>();
+            var comment = new Comment();
+
+            if (story != null)
+            {
+                comment.Story = story;
+                list.Add(comment);
+            }
+
+            return list;
         }
     }
 }

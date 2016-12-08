@@ -6,7 +6,7 @@ namespace Core.Entities
     /// <summary>
     /// Cards in the deck
     /// </summary>
-    public class StoryPoints
+    public class StoryPoint: Entity
     {
         /// <summary>
         /// List of values

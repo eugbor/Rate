@@ -90,12 +90,12 @@
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="Entities\Story.cs" />
     <Compile Include="Entities\StoryGroup.cs" />
-    <Compile Include="Entities\StoryPoints.cs" />
+    <Compile Include="Entities\StoryPoint.cs" />
     <Compile Include="Entities\User.cs" />
     <Compile Include="Managers\BaseManager.cs" />
     <Compile Include="Managers\CommentManager.cs" />
     <Compile Include="Managers\StoryManager.cs" />
-    <Compile Include="Managers\StoryPointsManager.cs" />
+    <Compile Include="Managers\StoryPointManager.cs" />
     <Compile Include="Managers\UserManager.cs" />
     <Compile Include="Migrations\201612071301307_SampleMigrations.cs" />
     <Compile Include="Migrations\201612071301307_SampleMigrations.Designer.cs">

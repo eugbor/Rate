@@ -42,6 +42,11 @@ namespace Core
         public DbSet<Comment> Comments { get; set; }
 
         /// <summary>
+        /// Interface access to the collection estimates
+        /// </summary>
+        public DbSet<StoryPoint> StoryPoints { get; set; }
+
+        /// <summary>
         /// Interface access to the collection tasks
         /// </summary>
         public DbSet<Story> Stors { get; set; }

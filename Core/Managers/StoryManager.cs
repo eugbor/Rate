@@ -84,7 +84,7 @@ namespace Core.Managers
            return Get(storyGroup.Stories.IndexOf(story) + 1);
         }
 
-        public Story GetLast(StoryGroup storyGroup, int storyId)
+        public Story GetPrevious(StoryGroup storyGroup, int storyId)
         {
             var story = Get(storyId);
             if (story == null)
