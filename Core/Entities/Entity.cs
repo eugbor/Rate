@@ -3,21 +3,21 @@
 namespace Core.Entities
 {
     /// <summary>
-    /// Interface base entity
+    /// Interface of base entity.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">Type of entity.</typeparam>
     public interface IEntity<T>
     {
         T Id { get; set; }
     }
 
     /// <summary>
-    /// Basic entity
+    /// Base entity.
     /// </summary>
     public abstract class Entity : IEntity<int>
     {
         /// <summary>
-        /// Primary key
+        /// Entity identifier.
         /// </summary>
         [Key]
         public int Id { get; set; }

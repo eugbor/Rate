@@ -1,12 +1,12 @@
 ﻿namespace Core
 {
     /// <summary>
-    /// User roles
+    /// List of user roles.
     /// </summary>
-    public static class Roles
+    enum Roles
     {
-        public const string Moderator = "Moderator";
-        public const string TeamMember = "TeamMember";
+        Moderator,
+        TeamMember,
 
     }
 }

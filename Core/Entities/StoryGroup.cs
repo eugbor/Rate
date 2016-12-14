@@ -3,19 +3,22 @@
 namespace Core.Entities
 {
     /// <summary>
-    /// Task group
+    /// Group of task.
     /// </summary>
     public class StoryGroup : Entity
     {
         /// <summary>
-        /// List of task group
+        /// List of task group.
         /// </summary>
         public virtual List<Story> Stories { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the group is active.
+        /// </summary>
         public bool IsActive { get; set; }
         
         /// <summary>
-        /// Ctor
+        /// Ctor.
         /// </summary>
         public StoryGroup()
         {

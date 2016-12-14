@@ -3,17 +3,17 @@
 namespace Core.Entities
 {
     /// <summary>
-    /// Task
+    /// Model of task.
     /// </summary>
     public class Story : Entity
     {
         /// <summary>
-        /// Status
+        /// Gets or sets a value indicating whether the task is active.
         /// </summary>
         public bool IsActive { get; set; }
 
         /// <summary>
-        /// Ctor
+        /// Ctor.
         /// </summary>
         public Story()
         {
@@ -21,27 +21,27 @@ namespace Core.Entities
         }
 
         /// <summary>
-        /// User who creates a set of tasks
+        /// User who creates a set of tasks.
         /// </summary>
         public virtual User User { get; set; }
 
         /// <summary>
-        /// Title
+        /// Title.
         /// </summary>
         public string Summary { get; set; }
 
         /// <summary>
-        /// Description
+        /// Description.
         /// </summary>
         public string Description { get; set; }
 
         /// <summary>
-        /// Link to the bug tracker
+        /// Link to the bug tracker.
         /// </summary>
         public string Link { get; set; }
 
         /// <summary>
-        /// Date of creation task
+        /// Date of task creations.
         /// </summary>
         public DateTime Date { get; set; }
     }

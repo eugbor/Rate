@@ -3,27 +3,27 @@
 namespace Core.Entities
 {
     /// <summary>
-    /// Comments to task
+    /// Task comment.
     /// </summary>
     public class Comment: Entity
     {
         /// <summary>
-        /// User
+        /// User.
         /// </summary>
         public virtual User User { get; set; }
 
         /// <summary>
-        /// Task
+        /// Task.
         /// </summary>
         public virtual Story Story { get; set; }
 
         /// <summary>
-        /// Comment
+        /// Comment.
         /// </summary>
         public string Text { get; set; }
 
         /// <summary>
-        /// Date of creation
+        /// Date of creation.
         /// </summary>
         public DateTime CreatedDate { get; set; }
     }

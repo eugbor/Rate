@@ -11,19 +11,19 @@ using Microsoft.Owin;
 namespace Core.Managers
 {
     /// <summary>
-	/// Manager for a user
+	/// User manager.
 	/// </summary>
     public class UserManager : UserManager<User, String>
     {
         /// <summary>
-        /// Context
+        /// User context.
         /// </summary>
         private Context Context { get; set; }
 
         /// <summary>
-        /// Ctor
+        /// Ctor.
         /// </summary>
-        /// <param name="context">Context</param>
+        /// <param name="context">User context.</param>
         internal UserManager(Context context)
             : this(new UserStore<User>(context))
         {
@@ -31,33 +31,32 @@ namespace Core.Managers
         }
 
         /// <summary>
-		/// Ctor
+		/// Ctor.
 		/// </summary>
-		/// <param name="store">Storage</param>
+		/// <param name="store">User storage.</param>
         internal UserManager(IUserStore<User> store)
             : base(store)
         {
         }
-       
 
         /// <summary>
-		/// Creates instance of manager
-		/// </summary>
-		/// <param name="options">Options</param>
-		/// <param name="owinContext">Context</param>
-		/// <returns>Manager</returns>
-        public static UserManager Create(IdentityFactoryOptions<UserManager> options, IOwinContext context)
+        /// Creates manager instance. 
+        /// </summary>
+        /// <param name="options">Options.</param>
+        /// <param name="owinContext">Context.</param>
+        /// <returns>User manager.</returns>
+        public static UserManager Create(IdentityFactoryOptions<UserManager> options, IOwinContext owinContext)
         {
-            var manager = new UserManager(context.Get<Context>());
+            var manager = new UserManager(owinContext.Get<Context>());
 
-            // Configure validation logic for usernames
+            // Configure validation logic for the usernames.
             manager.UserValidator = new UserValidator<User>(manager)
             {
                 AllowOnlyAlphanumericUserNames = false,
                 RequireUniqueEmail = true
             };
 
-            // Configure validation logic for passwords
+            // Configure validation logic for the passwords.
             manager.PasswordValidator = new PasswordValidator
             {
                 RequiredLength = 6,
@@ -77,10 +76,10 @@ namespace Core.Managers
         }
 
         /// <summary>
-        /// Create user
+        /// Creates user.
         /// </summary>
-        /// <param name="user">User</param>
-        /// <returns>Saved user</returns>
+        /// <param name="user">User.</param>
+        /// <returns>Saved user.</returns>
         public override Task<IdentityResult> CreateAsync(User user)
         {
             user.CreatedDate = DateTime.Now;
@@ -88,10 +87,25 @@ namespace Core.Managers
         }
 
         /// <summary>
-        /// Generates list of users on role
+        /// Deletes user.
         /// </summary>
-        /// <param name="roleName">Role</param>
-        /// <returns>List of users on role</returns>
+        /// <param name="user">User.</param>
+        /// <returns>Removed user.</returns>
+        public override Task<IdentityResult> DeleteAsync(User user)
+        {
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+
+            return base.DeleteAsync(user);
+        }
+
+        /// <summary>
+        /// Generates list of users on role.
+        /// </summary>
+        /// <param name="roleName">Role.</param>
+        /// <returns>List of users on role.</returns>
         public List<User> GetListByRole(string roleName)
         {
             var role = Context.Roles.FirstOrDefault(el => el.Name == roleName);
@@ -102,11 +116,11 @@ namespace Core.Managers
         }
 
         /// <summary>
-        /// Change password
+        /// Changes password.
         /// </summary>
-        /// <param name="id">Identifier</param>
-        /// <param name="newPassword">New password</param>
-        /// <returns>New saved password</returns>
+        /// <param name="id">Identifier.</param>
+        /// <param name="newPassword">New password.</param>
+        /// <returns>Identity result.</returns>
         public async Task<IdentityResult> ChangePasswordAsync(string id, string newPassword)
         {
             User user = await FindByIdAsync(id);
@@ -126,25 +140,29 @@ namespace Core.Managers
             return IdentityResult.Success;
         }
 
-        public bool Create(User current, User user, string password, Core.Context context)
+        /// <summary>
+        /// Creats teammember.
+        /// </summary>
+        /// <param name="current">Current user.</param>
+        /// <param name="user">New user.</param>
+        /// <param name="password">Password.</param>
+        /// <returns>Return a value indicating whether the user is creates.</returns>
+        public bool Create(User current, User user, string password)
         {
-            if (context.Roles.FirstOrDefault(role => role.Name == Core.Roles.Moderator) == null)
+            if (!GetRolesAsync(current.Id).Result.Contains(Roles.Moderator.ToString()))
                 return false;
-
-
-            var userManager = new UserManager(context);
             
             if (user != null)
             {
                 var teamMember = new User { Email = user.Email, UserName = user.Name };
                 
-                var result = userManager.Create(teamMember, password);
-
+                var result = CreateAsync(teamMember, password).Result;
                 
                 if (result.Succeeded)
-                {
-                    userManager.AddToRole(teamMember.Id, Core.Roles.TeamMember);
-                }
+                    result = AddToRoleAsync(teamMember.Id, Core.Roles.TeamMember.ToString()).Result;
+
+                if (!result.Succeeded)
+                    return false;
             }
 
             return true;

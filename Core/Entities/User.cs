@@ -4,22 +4,22 @@ using Microsoft.AspNet.Identity.EntityFramework;
 namespace Core.Entities
 {
     /// <summary>
-    /// User
+    /// User.
     /// </summary>
     public class User : IdentityUser
     {
         /// <summary>
-        /// Name
+        /// Name.
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
-        /// Status
+        /// Gets or sets a value indicating whether the user is active.
         /// </summary>
         public bool IsActive { get; set; }
 
         /// <summary>
-        /// Ctor
+        /// Ctor.
         /// </summary>
         public User()
         {
@@ -27,7 +27,7 @@ namespace Core.Entities
         }
 
         /// <summary>
-        /// Date of creation
+        /// Date of creation.
         /// </summary>
         public DateTime CreatedDate { get; set; }
     }

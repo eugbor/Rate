@@ -4,12 +4,12 @@ using System.Collections.Generic;
 namespace Core.Entities
 {
     /// <summary>
-    /// Cards in the deck
+    /// Story point.
     /// </summary>
     public class StoryPoint: Entity
     {
         /// <summary>
-        /// List of values
+        /// List of values.
         /// </summary>
         public static List<string> Estimates = new List<string>
         {
@@ -31,22 +31,22 @@ namespace Core.Entities
         };
 
         /// <summary>
-        /// User
+        /// User.
         /// </summary>
         public virtual User User { get; set; }
 
         /// <summary>
-        /// Task
+        /// Task.
         /// </summary>
         public virtual Story Story { get; set; }
 
         /// <summary>
-        /// Value of Estimates
+        /// Estimate value.
         /// </summary>
         public string Value { get; set; }
 
         /// <summary>
-        /// Date of creation
+        /// Date of creation.
         /// </summary>
         public DateTime CreatedDate { get; set; }
     }
