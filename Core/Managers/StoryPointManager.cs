@@ -77,21 +77,18 @@ namespace Core.Managers
         {
             if (!(story.User.IsActive))
                 return new List<StoryPoint>();
-
-            StoryPoint storyPoint = new StoryPoint();
-            if (storyPoint.Value == null)
-                throw new ArgumentNullException(nameof(storyPoint.Value));
+           
+            if (story == null)
+                throw new ArgumentNullException(nameof(story));
 
             //Если оценки всех участников совпадают или отличаются на одну ступень (для чисел),
             //задача показывает итоговую оценку как максимальную из двух. Это правило не работает,
             //если только один участник указал оценку выше, чем остальные.
-
-            storyPoint = Set.FirstOrDefault(el => el.Story.Id == story.Id); // оценки всех участников
-
+            
             List<StoryPoint> listSP = new List<StoryPoint>();
 
-            listSP.Add(storyPoint); // список оценок всех участников
-
+            listSP = GetList(story);
+            
             var estimate = StoryPoint.Estimates;
             int number;
             List<int> listInt = new List<int>();
@@ -112,7 +109,6 @@ namespace Core.Managers
                             listInt.Add(int.Parse(listSP[j].Value));
                         }
                     }
-
                 }
             }
 
