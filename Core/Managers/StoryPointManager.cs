@@ -75,39 +75,52 @@ namespace Core.Managers
         /// <returns>List of story point.</returns>
         public List<StoryPoint> GetList(Story story)
         {
-            if (!(story.User.IsActive))
-                return new List<StoryPoint>();
-           
             if (story == null)
                 throw new ArgumentNullException(nameof(story));
+
+            // активна ли задача? или (задачи в активном наборе, т.е. если все задачи активны, то и набор задач активен)
+            if (!(story.IsActive))
+                return new List<StoryPoint>();
+
+            // активен ли участник?
+            if (!(story.User.IsActive))
+                return new List<StoryPoint>();
 
             //Если оценки всех участников совпадают или отличаются на одну ступень (для чисел),
             //задача показывает итоговую оценку как максимальную из двух. Это правило не работает,
             //если только один участник указал оценку выше, чем остальные.
             
             List<StoryPoint> listSP = new List<StoryPoint>();
-
-            listSP = GetList(story);
             
-            var estimate = StoryPoint.Estimates;
-            int number;
-            List<int> listInt = new List<int>();
-            StoryPoint maxStoryPoint = new StoryPoint();
-           
-            for (int i = 0; i < listSP.Count; i++)
-            {
-                for (int j = i + 1; j < listSP.Count; j++)
-                {
-                    int index = estimate.IndexOf(listSP[i].Value);
+            IEnumerable<StoryPoint> list = listSP.Where(el => el.Story.Id == story.Id);
 
-                    if (int.TryParse(listSP[i].Value, out number) && int.TryParse(listSP[j].Value, out number))
+            List<StoryPoint> listStoryPoints = list as List<StoryPoint> ?? list.ToList();
+
+            int number; // число, для проверки (является ли строка числом)
+
+            if (listStoryPoints.Any(storyPoints => !(int.TryParse(storyPoints.Value, out number))))
+                return listStoryPoints;
+
+            List<string> estimate = StoryPoint.Estimates; // список значений оценок
+
+            List<int> listInt = new List<int>(); // список оценок в виде чисел
+
+            StoryPoint maxStoryPoint = new StoryPoint();
+            
+            for (int i = 0; i < listStoryPoints.Count; i++)
+            {
+                if (int.Parse(listStoryPoints[i].Value) == int.Parse(listStoryPoints[i + 1].Value))
+                    listInt.Add(int.Parse(listStoryPoints[i].Value));
+
+
+                int index = estimate.IndexOf(listStoryPoints[i].Value); // определяет индекс оценки в списке значений оценок
+
+                if ((index - 1) >= 0 || (index + 1) <= (estimate.Count - 5))
+                {
+                    if (int.Parse(estimate[index + 1]) == int.Parse(listStoryPoints[i + 1].Value) ||
+                        int.Parse(estimate[index - 1]) == int.Parse(listStoryPoints[i + 1].Value))
                     {
-                        if ((int.Parse(listSP[i].Value) == int.Parse(listSP[j].Value)) ||
-                            (int.Parse(estimate[index + 1]) == int.Parse(listSP[j].Value)) ||
-                            (int.Parse(estimate[index - 1]) == int.Parse(listSP[j].Value)))
-                        {
-                            listInt.Add(int.Parse(listSP[j].Value));
-                        }
+                        listInt.Add(int.Parse(listStoryPoints[i].Value));
                     }
                 }
             }
@@ -121,15 +134,16 @@ namespace Core.Managers
                 }
             }
 
-            if (indexEstimate > 1)
-            {
-                listInt.Sort();
-                maxStoryPoint.Value = listInt[listInt.Count - 1].ToString();
-                listSP.Add(maxStoryPoint);
-            }
+            if (indexEstimate < 0 || indexEstimate > 3)
+                return listStoryPoints;
+
+            listStoryPoints.RemoveAll(el => el.Story.Id == story.Id);
+            listInt.Sort();
+            maxStoryPoint.Value = listInt[listInt.Count - 1].ToString();
+            listStoryPoints.Add(maxStoryPoint);
             
             
-            return listSP;
+            return listStoryPoints;
         }
     }
 }
