@@ -89,46 +89,43 @@ namespace Core.Managers
             //Если оценки всех участников совпадают или отличаются на одну ступень (для чисел),
             //задача показывает итоговую оценку как максимальную из двух. Это правило не работает,
             //если только один участник указал оценку выше, чем остальные.
-            
-            List<StoryPoint> listSP = new List<StoryPoint>();
-            
-            IEnumerable<StoryPoint> list = listSP.Where(el => el.Story.Id == story.Id);
 
-            List<StoryPoint> listStoryPoints = list as List<StoryPoint> ?? list.ToList();
+            List<StoryPoint> listStoryPoints = Set.Where(el => el.Story.Id == story.Id).ToList();
 
             int number; // число, для проверки (является ли строка числом)
 
             if (listStoryPoints.Any(storyPoints => !(int.TryParse(storyPoints.Value, out number))))
                 return listStoryPoints;
 
+            List<int> listInt = listStoryPoints.Select(str => int.Parse(str.Value)).ToList(); // список оценок в виде чисел
+
+            List<int> newListInt = new List<int>(); // новый список оценок в виде чисел
+
             List<string> estimate = StoryPoint.Estimates; // список значений оценок
 
-            List<int> listInt = new List<int>(); // список оценок в виде чисел
-
-            StoryPoint maxStoryPoint = new StoryPoint();
             
-            for (int i = 0; i < listStoryPoints.Count; i++)
+            for (int i = 0; i < listInt.Count; i++)
             {
-                if (int.Parse(listStoryPoints[i].Value) == int.Parse(listStoryPoints[i + 1].Value))
-                    listInt.Add(int.Parse(listStoryPoints[i].Value));
+                if (listInt[i] == listInt[i + 1])
+                    newListInt.Add(listInt[i]);
 
 
-                int index = estimate.IndexOf(listStoryPoints[i].Value); // определяет индекс оценки в списке значений оценок
+                int index = estimate.IndexOf(listInt[i].ToString()); // определяет индекс оценки в списке значений оценок
 
                 if ((index - 1) >= 0 || (index + 1) <= (estimate.Count - 5))
                 {
-                    if (int.Parse(estimate[index + 1]) == int.Parse(listStoryPoints[i + 1].Value) ||
-                        int.Parse(estimate[index - 1]) == int.Parse(listStoryPoints[i + 1].Value))
+                    if (estimate[index + 1] == listInt[i + 1].ToString() ||
+                        estimate[index - 1] == listInt[i + 1].ToString())
                     {
-                        listInt.Add(int.Parse(listStoryPoints[i].Value));
+                        newListInt.Add(listInt[i]);
                     }
                 }
             }
 
             int indexEstimate = 0;
-            for (int i = 0; i < listInt.Count; i++)
+            for (int i = 0; i < newListInt.Count; i++)
             {
-                if (listInt[i] != listInt[i+1])
+                if (newListInt[i] != newListInt[i+1])
                 {
                     indexEstimate++;
                 }
@@ -137,11 +134,11 @@ namespace Core.Managers
             if (indexEstimate < 0 || indexEstimate > 3)
                 return listStoryPoints;
 
+            StoryPoint maxStoryPoint = new StoryPoint();
             listStoryPoints.RemoveAll(el => el.Story.Id == story.Id);
-            listInt.Sort();
-            maxStoryPoint.Value = listInt[listInt.Count - 1].ToString();
+            newListInt.Sort();
+            maxStoryPoint.Value = newListInt[newListInt.Count - 1].ToString();
             listStoryPoints.Add(maxStoryPoint);
-            
             
             return listStoryPoints;
         }
