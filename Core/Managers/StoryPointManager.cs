@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using Core.Entities;
 using Microsoft.AspNet.Identity.Owin;
@@ -77,70 +76,51 @@ namespace Core.Managers
         {
             if (story == null)
                 throw new ArgumentNullException(nameof(story));
-
-            // активна ли задача? или (задачи в активном наборе, т.е. если все задачи активны, то и набор задач активен)
-            if (!(story.IsActive))
+           
+            if (!story.IsActive)
                 return new List<StoryPoint>();
 
-            // активен ли участник?
-            if (!(story.User.IsActive))
-                return new List<StoryPoint>();
-
-            //Если оценки всех участников совпадают или отличаются на одну ступень (для чисел),
-            //задача показывает итоговую оценку как максимальную из двух. Это правило не работает,
-            //если только один участник указал оценку выше, чем остальные.
+            var countActiveUser = Context.Users.Count(el => el.IsActive);
 
             List<StoryPoint> listStoryPoints = Set.Where(el => el.Story.Id == story.Id).ToList();
 
-            int number; // число, для проверки (является ли строка числом)
-
-            if (listStoryPoints.Any(storyPoints => !(int.TryParse(storyPoints.Value, out number))))
-                return listStoryPoints;
-
-            List<int> listInt = listStoryPoints.Select(str => int.Parse(str.Value)).ToList(); // список оценок в виде чисел
-
-            List<int> newListInt = new List<int>(); // новый список оценок в виде чисел
-
-            List<string> estimate = StoryPoint.Estimates; // список значений оценок
-
+            if(countActiveUser != listStoryPoints.Count)
+                return new List<StoryPoint>();
             
-            for (int i = 0; i < listInt.Count; i++)
+            Dictionary<int, int> points = new Dictionary<int, int>(); 
+
+            foreach (var point in listStoryPoints)
             {
-                if (listInt[i] == listInt[i + 1])
-                    newListInt.Add(listInt[i]);
+                int number;
 
+                if (!int.TryParse(point.Value, out number))
+                    return listStoryPoints;
 
-                int index = estimate.IndexOf(listInt[i].ToString()); // определяет индекс оценки в списке значений оценок
-
-                if ((index - 1) >= 0 || (index + 1) <= (estimate.Count - 5))
+                if (points.ContainsKey(number))
                 {
-                    if (estimate[index + 1] == listInt[i + 1].ToString() ||
-                        estimate[index - 1] == listInt[i + 1].ToString())
-                    {
-                        newListInt.Add(listInt[i]);
-                    }
+                    points[number]++;
+                }
+                else
+                {
+                    points.Add(number, 1);
                 }
             }
-
-            int indexEstimate = 0;
-            for (int i = 0; i < newListInt.Count; i++)
-            {
-                if (newListInt[i] != newListInt[i+1])
-                {
-                    indexEstimate++;
-                }
-            }
-
-            if (indexEstimate < 0 || indexEstimate > 3)
+            
+            if (points.Count > 2)
                 return listStoryPoints;
 
-            StoryPoint maxStoryPoint = new StoryPoint();
-            listStoryPoints.RemoveAll(el => el.Story.Id == story.Id);
-            newListInt.Sort();
-            maxStoryPoint.Value = newListInt[newListInt.Count - 1].ToString();
-            listStoryPoints.Add(maxStoryPoint);
-            
-            return listStoryPoints;
+            int maxPoint = points.Keys.Max();
+
+            if (points[maxPoint] == 1)
+                return listStoryPoints;
+
+            return new List<StoryPoint>
+            {
+                new StoryPoint
+                {
+                    Value = maxPoint.ToString()
+                }
+            };
         }
     }
 }
